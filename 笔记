@@ -1,0 +1,7 @@
+1.odbc链接中sqlConnect函数所用到的数据库名（服务器名）：
+  数据库名需要在odbc.ini以及odbcinst.ini中注册，可参考https://www.cnblogs.com/flying-tiger/p/5950600.html
+  本程序数据库为informix，处理方法是将informix目录下的/etc/odbc.ini和odbcinst.ini直接复制到根目录下/etc文件夹下
+  之后输入指令“isql odbc_demodb -v”进行测试
+  
+2.目标端程序在使用socket时注意：
+  调用bind函数时，需要绑定本机ip地址，此处注意不应将sockaddr_in结构体下的sin_addr.s_addr赋值为“127.0.0.1”,而是本机IP
