@@ -8,7 +8,7 @@
 #include <errno.h>
 
 #define PORT 6666
-#define ADDR "192.168.245.129"
+#define ADDR "172.28.164.151"
 
 int main(){
     int iSocket;    //句柄
@@ -34,15 +34,24 @@ int main(){
     }
     
     char sql[2048];         //要发送的sql
-    scanf("%[^\n]",sql);   
-    
-    send(iSocket,sql,strlen(sql),0);    //发送sql
-
     char recvMessage[255];         //接受server端回复的消息
-    int ret = recv(iSocket,recvMessage,255,0);
-    if (ret > 0)
-    {
-        printf("接受到来自server端的回复：%s \n",recv);
+    while(strcmp(sql," ") != 0){        
+        scanf("%[^\n]",sql);   
+        if(strcmp(sql,"bye")){
+            send(iSocket,sql,strlen(sql),0);    //发送sql
+            getchar();                          //此处添加getchar()是为了消费语句结束后的换行符，否则循环运行到上一句无法正常输入
+            int ret = recv(iSocket,recvMessage,255,0);
+            if (ret > 0)
+            {
+                printf("接受到来自server端的回复：%s \n",recvMessage);
+                memset(sql,0,sizeof(sql));          //接受到server端的回复，说明成功发送sql语句，故需将sql重置，否则无限循环会
+                fflush(stdin);
+            }
+        }else
+        {
+            printf("源端接受到结束信号！\n");
+            break;
+        }       
     }
     close(iSocket);
     return 0;
