@@ -13,7 +13,7 @@
 
 
 #define PORT 6666
-#define ADDR "192.168.245.129" 
+#define ADDR "172.28.164.151" 
 #define BACK_LOG 5
 
 SQLHENV henv;
@@ -132,19 +132,28 @@ int main(){
     }
 
     char sql[2048];
-    ret = recv(accept_socket,sql,sizeof(sql),0);
+    while (1)
+    {
+        ret = recv(accept_socket,sql,sizeof(sql),0);    //循环接收
     
-    if (ret <= 0)
-    {
-        printf("接受失败或对端关闭连接！\n");
-        close(accept_socket);
-        close(iSocket);
-        return 0;
-    }else
-    {
-        printf("成功接受到sql语句!\n");
+        if (ret <= 0)
+        {
+            printf("接受失败或对端关闭连接！\n");
+            break;
+        }else
+        {
+            printf("成功接受到sql语句!\n");
+        }
+        ret = insert_into_db(sql);
+        if(ret == 1){
+            send(accept_socket,"success in odbc",sizeof("success in odbc"),0);
+        }else{
+            send(accept_socket,"error in odbc!",sizeof("error in odbc!"),0);
+            break;
+        }
     }
-    insert_into_db(sql);
+    close(accept_socket);
+    close(iSocket);
     return 0;
     
     
